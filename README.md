@@ -11,6 +11,7 @@ numerical subtleties that matter in practice.
 | `quantmet.helmholtz` | Global Helmholtz decomposition (velocity potential / streamfunction, divergent / rotational wind) by spherical-harmonic Poisson inversion on a pole-free Gauss–Legendre grid | — |
 | `quantmet.wk_filter` | Wheeler–Kiladis space-time filtering of equatorial waves (Kelvin / ER / MJO) with per-wavenumber dispersion bounds from the full cubic; Hermitian-safe FFT masking; Lanczos low-pass | Wheeler & Kiladis (1999, JAS) |
 | `quantmet.tc_detect` | Closed-circulation tropical-cyclone candidate detection with an O(1)-per-gridpoint summed-area-table ring test (C kernel, auto-compiled) | — |
+| `quantmet.epflux` | Quasi-geostrophic Eliassen–Palm flux + divergence as a zonal force (the wave driving of the mean flow), with a per-member-flux ensemble path | Eliassen & Palm (1961); Edmon, Hoskins & McIntyre (1980, JAS) |
 
 ## Quick starts
 
@@ -38,6 +39,17 @@ from quantmet.wk_filter import wk_filter
 kelvin = wk_filter(olr_anom, "Kelvin")     # same shape, band-filtered, real
 ```
 
+**Stratospheric wave driving** (the SSW forcing diagnostic, live on the
+Atmospheric-Response page):
+
+```python
+from quantmet.epflux import ep_flux, ensemble_ep_flux
+r = ep_flux(u, v, t, lat, plev_hpa, kmax=3)   # (plev, lat, lon) snapshots in
+r.force                                        # ∇·F as m/s per day, (plev, lat)
+ens = ensemble_ep_flux(((u_m, v_m, t_m) for u_m, v_m, t_m in members),
+                       lat, plev_hpa)          # per-member fluxes averaged
+```
+
 **Ensemble TC tracking building block**:
 
 ```python
@@ -58,6 +70,13 @@ clat, clon, cp = detect_candidates(mslp_hpa, lat, lon, ring_deg=2.5, depth_hpa=2
   imaginary residue to silently discard.
 - **Summed-area tables** turn a radius-r ring mean into four lookups,
   making closed-circulation tests O(1) per gridpoint.
+- **Global-mean static stability** in the E–P heat-flux term: a local
+  ∂θ/∂p crosses zero in the troposphere and blows the flux up by orders of
+  magnitude; and **floor cos φ before smoothing** — smoothing first lets the
+  polar 1/cos φ blow-up bleed equatorward and bury the real signal.
+- **Ensemble quadratics**: E–P flux is quadratic in the eddies, so average
+  per-member fluxes; the flux of the ensemble-mean fields fades with lead
+  time as averaging damps the waves.
 
 ## Install
 
@@ -73,7 +92,8 @@ arm64 and Linux x86-64).
 
 Extracted from the pipelines behind scorvec.com's real-time products:
 HRRR/RRFS spectra comparison, Walker-circulation monitor, equatorial-wave
-Hovmöller, and the 101-member ECMWF ensemble TC tracker. See also
+Hovmöller, the 101-member ECMWF ensemble TC tracker, and the E–P flux &
+wave-driving forecast loop. See also
 [ufs-hafs-on-apple-silicon](https://github.com/scorvec/ufs-hafs-on-apple-silicon)
 for the companion project compiling and running NOAA's hurricane model on a
 laptop.
