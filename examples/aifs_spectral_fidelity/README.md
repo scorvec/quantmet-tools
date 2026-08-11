@@ -39,6 +39,12 @@ the precipitation fields:
 
 ![panels](tt_compare_d05.png)
 
+A note on the reference slopes: the Nastrom–Gage canon puts k⁻³ at synoptic
+scales and k⁻⁵/³ in the mesoscale, but **no 0.25° product resolves the
+mesoscale transition** — the measured synoptic slopes here are −2.9 (250 hPa)
+and −2.3 (700 hPa), and everything below ~150 km is dissipation tail. The
+−5/³ guide is drawn for orientation only.
+
 Practical corollaries: past ~a week, read a single-AIFS chart as a smoothed
 consensus rather than a weather realization; and any diagnostic quadratic in
 the fields (E–P flux, wave-activity flux, eddy statistics) should be computed
