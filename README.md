@@ -57,6 +57,13 @@ from quantmet.tc_detect import detect_candidates
 clat, clon, cp = detect_candidates(mslp_hpa, lat, lon, ring_deg=2.5, depth_hpa=2.0)
 ```
 
+## Case studies
+
+- [**AIFS single vs AIFS-ENS control: spectral fidelity by lead time**](examples/aifs_spectral_fidelity/)
+  — the deterministic AIFS blurs progressively (MSE objective) while the
+  CRPS-trained ENS control holds a realistic spectrum ten days in; measured
+  with `quantmet.dct_spectra` on open data.
+
 ## Numerical notes worth stealing
 
 - **DCT over FFT for regional spectra**: no periodicity assumption, so no
