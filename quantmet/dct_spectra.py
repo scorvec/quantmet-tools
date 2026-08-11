@@ -17,7 +17,8 @@ import numpy as np
 import scipy.fft
 from scipy import stats
 
-__all__ = ["ke_spectrum", "spectral_slope", "effective_resolution"]
+__all__ = ["ke_spectrum", "spectral_slope", "effective_resolution",
+           "fidelity_resolution"]
 
 
 def ke_spectrum(u: np.ndarray, v: np.ndarray, res_km: float):
@@ -69,3 +70,26 @@ def effective_resolution(wavelengths, power, ref_slope: float = -5.0 / 3.0,
     ratio = 10 * np.log10(np.maximum(power, 1e-300) / model)
     below = np.where((wavelengths < fit_km[0]) & (ratio < -drop_db))[0]
     return float(wavelengths[below[0]]) if len(below) else float("nan")
+
+def fidelity_resolution(wl, p, p_ref, frac=0.5):
+    """Finest wavelength at which the spectrum still carries at least `frac`
+    of a reference spectrum's energy density — e.g. a forecast against its own
+    analysis. Unlike dissipation-range criteria (which can be undefined when a
+    spectrum has no clean roll-off), this is defined whenever the ratio drops
+    below `frac` anywhere, and it directly measures scale-dependent energy
+    loss rather than numerical damping. Returns NaN only if the spectrum never
+    falls below the threshold (fidelity maintained at all resolved scales)."""
+    import numpy as np
+    wl = np.asarray(wl, float)
+    r = np.asarray(p, float) / np.asarray(p_ref, float)
+    below = r < frac
+    if not below.any():
+        return float("nan")
+    i = np.argmax(below)                      # first scale (largest wl) below
+    if i == 0:
+        return float(wl[0])
+    # log-interpolate the crossing between i-1 and i
+    w1, w2 = np.log(wl[i - 1]), np.log(wl[i])
+    r1, r2 = r[i - 1], r[i]
+    t = (frac - r1) / (r2 - r1) if r2 != r1 else 0.0
+    return float(np.exp(w1 + t * (w2 - w1)))

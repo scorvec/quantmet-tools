@@ -12,10 +12,20 @@ init 2026-08-11 00Z (dotted = analysis, identical for both by construction):
 
 | lead | level | AIFS single | AIFS-ENS control |
 |---|---|---|---|
-| day 5 | 700 hPa | slope −3.61 · eff. res 112 km | slope −2.35 · eff. res 72 km |
-| day 10 | 700 hPa | curve sinks further (slope −2.95 is a flattening artifact of overall variance loss) | slope −2.52 · eff. res 89 km |
-| day 5 | 250 hPa | −4.64 · 161 km | −3.29 · 123 km |
-| day 10 | 250 hPa | −4.44 · eff. res undefined (spectrum too degraded) | −3.13 · 161 km |
+| day 5 | 700 hPa | slope −3.61 · fidelity res 959 km | slope −2.35 · fidelity res 82 km |
+| day 10 | 700 hPa | −2.95 · **1929 km** | −2.52 · 82 km |
+| day 5 | 250 hPa | −4.64 · 433 km | −3.29 · 106 km |
+| day 10 | 250 hPa | −4.44 · 626 km | −3.13 · 107 km |
+
+**Fidelity resolution** (`quantmet.dct_spectra.fidelity_resolution`): the
+finest wavelength at which a forecast still carries ≥50% of its own
+*analysis* spectral density. Unlike dissipation-range criteria it is defined
+for any forecast, and it measures scale-dependent energy loss directly. A
+fair objection — a day-10 spectrum may legitimately differ from day 0 because
+the *weather* changed — answers itself here: both models rode the same
+regime, and the control held the analysis spectrum to ~100 km throughout, so
+the atmosphere's spectrum was quasi-stationary and the single's departure is
+model smoothing, not meteorology.
 
 The deterministic model slides toward an ensemble-mean-like state — MSE
 rewards hedging, so unpredictable scales are averaged away, progressively and

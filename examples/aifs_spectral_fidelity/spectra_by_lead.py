@@ -9,7 +9,7 @@ open-data retention window.
 import numpy as np
 import xarray as xr
 from ecmwf.opendata import Client
-from quantmet.dct_spectra import ke_spectrum, spectral_slope, effective_resolution
+from quantmet.dct_spectra import ke_spectrum, spectral_slope, fidelity_resolution
 
 DATE = "2026-08-11"
 STEPS = (0, 120, 240)
@@ -34,12 +34,17 @@ def box_uv(path, lev):
     return (u.values[:, order][np.ix_(mlat, mlon)],
             v.values[:, order][np.ix_(mlat, mlon)])
 
+ref = {}
 res_km = 111.2 * 0.25 * np.cos(np.deg2rad(40.0))
 for lev in LEVS:
     for step in STEPS:
         for model in ("aifs-single", "aifs-ens"):
             u, v = box_uv(f"{model}_{lev}_s{step}.grib2", lev)
             wl, p = ke_spectrum(u, v, res_km=res_km)
+            if step == 0:
+                ref[(lev, model)] = p
+            fr = fidelity_resolution(wl, p, ref[(lev, model)])
             print(f"{lev:>4} hPa day {step//24:>2} {model:>12}: "
                   f"slope {spectral_slope(wl, p, 100, 1000):+.2f} · "
-                  f"eff res {effective_resolution(wl, p):.0f} km")
+                  f"fidelity res {fr:.0f} km" if step else
+                  f"{lev:>4} hPa day  0 {model:>12}: analysis reference")
