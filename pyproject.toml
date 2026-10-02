@@ -1,27 +1,42 @@
 [build-system]
-requires = ["setuptools>=64"]
+requires = ["setuptools>=61"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "quantmet"
-version = "0.2.0"
-description = "Quantitative meteorology toolkit: power spectra, Helmholtz decomposition, equatorial-wave filtering, E-P and wave-activity fluxes, potential vorticity and the dynamic tropopause, tropical-cyclone diagnostics, wave packets, ensemble sensitivity, and global conservation budgets"
+version = "0.3.0"
+description = "Quantitative meteorology toolkit: TEM and Eliassen-Palm diagnostics, downward control, Takaya-Nakamura wave-activity flux, Gill model, QBO zero-wind line, Wheeler-Kiladis filtering, Helmholtz decomposition, DCT spectra, potential vorticity and the dynamic tropopause, Rossby wave packets, tropical-cyclone diagnostics, ensemble sensitivity, global conservation budgets, TC detection and significance tools"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { file = "LICENSE" }
+license = { text = "MIT" }
+authors = [{ name = "Shawn Corvec" }]
+keywords = ["meteorology", "atmospheric dynamics", "stratosphere", "Eliassen-Palm flux",
+            "transformed Eulerian mean", "wave activity flux", "equatorial waves",
+            "potential vorticity", "tropical cyclones", "angular momentum"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
 dependencies = ["numpy", "scipy"]
 
 [project.optional-dependencies]
 helmholtz = ["pyshtools", "xarray"]
+waf = ["pyshtools", "xarray"]
 tc = ["eccodes", "pyshtools", "xarray"]
 test = ["pytest"]
 all = ["pyshtools", "xarray", "eccodes", "pytest"]
+
+[project.urls]
+Homepage = "https://scorvec.com"
+Source = "https://github.com/scorvec/quantmet-tools"
+Changelog = "https://github.com/scorvec/quantmet-tools/blob/main/CHANGELOG.md"
 
 [tool.setuptools]
 packages = ["quantmet"]
 
 [tool.setuptools.package-data]
-quantmet = ["*.c"]
+quantmet = ["tc_detect.c"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

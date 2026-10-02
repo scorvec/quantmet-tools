@@ -12,23 +12,11 @@ with primes the deviation from the zonal mean band-passed to zonal
 wavenumbers 1..kmax and [.] the zonal mean (Edmon, Hoskins & McIntyre 1980).
 
 Implementation notes that matter in practice:
-- Static stability (``theta_p``): the default since v0.2 is the ZONAL-MEAN
-  profile d[theta]/dp (phi, p). The GLOBAL-mean profile (``theta_p="global"``,
-  the v0.1 behaviour and the textbook QG choice) carries tropospheric
-  stability above the polar tropopause, 3-4x too small there, which inflates
-  F_p and its p-derivative at 250-300 hPa poleward of ~70 deg; against an
-  analysis primitive-equation E-P budget the zonal profile raised the
-  stratospheric pattern correlation (SH 0.83 -> 0.87, NH 0.69 -> 0.81). Either
-  way it is floored at -5e-5 K/Pa (never neutral or unstable): a POINTWISE
-  d(theta)/dp would cross zero in the troposphere and blow the term up.
-- Vertical derivatives are taken in ln p on the ACTUAL levels,
-  d/dp = (1/p) d/d(ln p): accurate on log-spaced stratospheric levels
-  (1, 2, 3, 5, 7, 10 ... hPa) where a centred difference in p is lopsided.
-- Below ground (``psfc``): models extrapolate fields under the surface. Where
-  more than ``bg_frac`` of a latitude circle's longitudes lie below ground at a
-  level, the eddy fluxes are set to NaN BEFORE any derivative (so the level
-  just above, whose centred difference would reach into extrapolated data,
-  goes too): Antarctica, Greenland, Tibet, the Andes.
+- The static stability d(theta_bar)/dp uses the GLOBAL-mean (area-weighted)
+  theta profile, a function of pressure only. A local d(theta)/dp crosses
+  zero in the troposphere and blows the heat-flux term up by many orders of
+  magnitude; the global profile is the standard QG choice and is floored at
+  -5e-5 K/Pa besides.
 - cos(phi) is floored (85 deg) in the divergence *before* any smoothing.
   Smoothing first lets the polar 1/cos(phi) blow-up bleed equatorward and
   bury the real signal; the polar rows are masked in the returned force.
@@ -37,10 +25,22 @@ Implementation notes that matter in practice:
   ensemble-mean fields -- ensemble averaging damps the eddies with lead time
   and the flux fades with them.
 
-Powers the live E-P flux & wave-driving forecast loop on
-https://scorvec.com/stratosphere.html (GEFS, 31 levels 1-1000 hPa, day 0-15).
+- Axes: every function here reads longitude as the LAST axis and latitude as
+  the last axis of zonal means, whatever leads them (a member axis, a lead
+  axis). A band-pass or smoothing along a fixed positional axis silently
+  filters latitude -- or members -- once a leading axis is added; the site
+  once ran "k = 1-3 eddies" that were meridional modes 1-3 of the whole
+  field for exactly that reason. tests/test_epflux.py pins it.
 
-Requires: numpy (scipy for smooth_deg).
+charney_drazin_excess adds the vertical-propagation window for stationary
+planetary waves (Charney & Drazin 1961): u - U_c for zonal wavenumber k, with
+0 < u < U_c the corridor in which wave k can propagate upward.
+
+Powers the live E-P flux & wave-driving forecast loop on
+https://scorvec.com/stratosphere.html (AIFS-ENS and IFS-ENS, day 0-15; also
+shown on https://scorvec.com/circulation.html).
+
+Requires: numpy (flux); scipy for smooth_deg and for the smoothing in charney_drazin_excess.
 """
 from __future__ import annotations
 
@@ -52,7 +52,10 @@ A_EARTH = 6.371e6
 OMEGA = 7.292e-5
 KAPPA = 0.2854
 P_REF = 1000.0            # hPa, for potential temperature
-__all__ = ["EPFlux", "zonal_bandpass", "ep_flux", "ensemble_ep_flux", "below_ground_share"]
+G = 9.80665
+H_SCALE = 7000.0          # m, log-pressure scale height
+__all__ = ["EPFlux", "zonal_bandpass", "ep_flux", "ensemble_ep_flux",
+           "charney_drazin_uc", "charney_drazin_excess"]
 
 
 @dataclass
@@ -201,3 +204,60 @@ def ensemble_ep_flux(members, lat: np.ndarray, plev: np.ndarray,
     return _assemble(uv_s / n, vth_s / n, th_s / n, ub_s / n,
                      lat, plev, polar_mask_deg, theta_p,
                      None if bg_s is None else bg_s / n, bg_frac, smooth_deg)
+
+
+def charney_drazin_uc(lat: np.ndarray, plev: np.ndarray, th_prof: np.ndarray,
+                      k: int = 1, H: float = H_SCALE) -> np.ndarray:
+    """Charney-Drazin critical velocity U_c (m/s) on (..., plev, lat) for a
+    stationary zonal wavenumber k, plane-wave form:
+
+        U_c = beta / [ (k / (a cos phi))^2 + l^2 + f^2 / (4 N^2 H^2) ]
+
+    with the standard meridional scale l = 2/a (which puts U_c(60 deg) near
+    28 m/s for a stratospheric N^2 = 4e-4 s^-2). N^2 = (g/theta) d theta/dz
+    from the (..., plev) potential-temperature profile th_prof (a global or
+    band mean -- the QG reference profile), z = -H ln(p/1000 hPa), floored
+    at 5e-6 s^-2. cos(phi) is floored at 5e-3."""
+    lat = np.asarray(lat, float)
+    plev = np.asarray(plev, float)
+    th = np.asarray(th_prof, float)
+    latr = np.deg2rad(lat)
+    cosp = np.clip(np.cos(latr), 5e-3, None)
+    f = 2 * OMEGA * np.sin(latr)
+    beta = 2 * OMEGA * cosp / A_EARTH
+    z = -H * np.log(plev / P_REF)
+    N2 = np.clip(G / th * np.gradient(th, z, axis=-1), 5e-6, None)[..., None]
+    return beta / ((k / (A_EARTH * cosp)) ** 2 + (2.0 / A_EARTH) ** 2
+                   + f ** 2 / (4.0 * N2 * H ** 2))
+
+
+def charney_drazin_excess(U: np.ndarray, lat: np.ndarray, plev: np.ndarray,
+                          th_prof: np.ndarray, k: int = 1, H: float = H_SCALE,
+                          smooth_deg: float = 2.0, lat_min: float = 20.0,
+                          lat_max: float = 82.0, p_max: float = 400.0) -> np.ndarray:
+    """u - U_c (m/s) on (..., plev, lat): the Charney-Drazin propagation
+    ceiling for stationary wavenumber k. Its zero contour is the ceiling;
+    with the u = 0 line it brackets the corridor 0 < u < U_c.
+
+    U       : zonal-mean zonal wind (..., plev, lat); leading axes (members,
+              leads) are carried through untouched.
+    th_prof : (plev,) or (..., plev) reference potential temperature.
+    smooth_deg : Gaussian smoothing of U in LATITUDE only (sigma in degrees;
+              0 = none) -- applied on the last axis, never a member axis.
+    Masked (NaN) at |lat| < lat_min (QG invalid), |lat| > lat_max (beta -> 0,
+    U_c collapses) and p > p_max hPa.
+
+    The plane-wave form was chosen over the full Matsuno refractive index
+    n^2 = 0 after validation on the site: a strong jet sharpens its own PV
+    gradient, so the full index stays positive over the jet core and its
+    zero line marks flank reflecting pockets, not the lid."""
+    lat = np.asarray(lat, float)
+    plev = np.asarray(plev, float)
+    U = np.asarray(U, float)
+    if smooth_deg and smooth_deg > 0:
+        from scipy.ndimage import gaussian_filter1d
+        dlat = abs(float(np.median(np.diff(lat))))
+        U = gaussian_filter1d(U, sigma=smooth_deg / dlat, axis=-1, mode="nearest")
+    out = U - charney_drazin_uc(lat, plev, th_prof, k=k, H=H)
+    out = np.where((np.abs(lat) < lat_min) | (np.abs(lat) > lat_max), np.nan, out)
+    return np.where((plev > p_max)[:, None], np.nan, out)

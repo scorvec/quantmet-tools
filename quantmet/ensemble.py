@@ -16,7 +16,7 @@ alternating cycles then rocks back and forth. ``cycle_offset`` estimates the off
 trailing same-valid-time differences between the two families (no lookahead: only pairs initialised before the target
 run), to be SUBTRACTED from the target run. Archive RAW values; archiving corrected ones collapses future estimates.
 
-Requires: numpy, scipy.
+Requires: numpy, scipy (quantmet.stats for the FDR).
 """
 from __future__ import annotations
 
@@ -26,19 +26,10 @@ __all__ = ["bh", "sensitivity", "group_composite", "cycle_offset"]
 
 
 def bh(p: np.ndarray, q: float = 0.10) -> np.ndarray:
-    """Benjamini-Hochberg discoveries at FDR q: boolean mask, same shape as p; NaN p-values are never significant."""
-    p = np.asarray(p, float)
-    flat = p.ravel(); ok = np.isfinite(flat)
-    sig = np.zeros(flat.shape, bool)
-    pv = flat[ok]
-    if not pv.size:
-        return sig.reshape(p.shape)
-    o = np.argsort(pv); m = pv.size
-    below = np.where(pv[o] <= q * np.arange(1, m + 1) / m)[0]
-    if below.size:
-        cut = pv[o][below[-1]]
-        sig[np.where(ok)[0][pv <= cut]] = True
-    return sig.reshape(p.shape)
+    """Benjamini-Hochberg discoveries at FDR q: boolean mask, same shape as p; NaN p-values are never significant.
+    Thin alias of quantmet.stats.benjamini_hochberg."""
+    from .stats import benjamini_hochberg
+    return benjamini_hochberg(p, q)
 
 
 def sensitivity(x: np.ndarray, J: np.ndarray, q: float = 0.10, min_sd: float = 0.0) -> dict | None:

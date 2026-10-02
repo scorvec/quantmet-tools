@@ -6,8 +6,8 @@
  * band, with longitude wrap via ghost columns. ~10x the throughput of the
  * scipy path on a 721x1440 field.
  *
- * Build (done automatically by tc_tracker.py when missing/stale):
- *   cc -O3 -shared -fPIC -o detect.dylib detect.c
+ * Build (done automatically by tc_detect.py into a per-user cache dir):
+ *   cc -O3 -shared -fPIC -o tc_detect.so tc_detect.c
  */
 #include <stdint.h>
 #include <string.h>

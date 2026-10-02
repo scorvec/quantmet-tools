@@ -1,7 +1,11 @@
 __pycache__/
-*.pyc
+*.py[cod]
 *.so
-*.egg-info/
+*.dylib
+*.dll
 build/
 dist/
+*.egg-info/
 .pytest_cache/
+.venv/
+venv/

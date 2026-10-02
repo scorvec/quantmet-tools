@@ -1,17 +1,47 @@
 name: tests
+
 on:
   push:
   pull_request:
+  workflow_dispatch:
+
 jobs:
-  pytest:
+  core:
+    name: core deps (Python ${{ matrix.python }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python: ["3.10", "3.12"]
+        python: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python }}
-      - run: pip install -e .[test]
-      - run: pytest -q
+      - name: Install (numpy + scipy only)
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[test]"
+      - name: Optional extras must be absent
+        run: python -c "import importlib.util as u, sys; sys.exit(any(u.find_spec(m) for m in ('pyshtools', 'xarray')))"
+      - name: Test the installed package
+        run: |
+          cd tests
+          python -m pytest -q -rs --rootdir=. .
+
+  extras:
+    name: with extras (pyshtools, xarray)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install with extras
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install ".[helmholtz,waf,test]"
+      - name: Test the installed package
+        run: |
+          cd tests
+          python -m pytest -q -rs --rootdir=. .

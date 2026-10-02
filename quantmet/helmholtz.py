@@ -12,9 +12,17 @@ Implementation notes that matter in practice:
 - cos(phi) is clipped when evaluating grad(chi) near the poles of the
   output Driscoll-Healy grid.
 
-Powers the Walker-circulation monitor at https://scorvec.com (velocity
-potential of the 200 hPa divergent wind, and the zonal mass streamfunction
-built from the divergent zonal wind).
+Powers the Walker-circulation monitor at https://scorvec.com/circulation.html
+(velocity potential of the 200 hPa divergent wind, and the zonal mass
+streamfunction built from the divergent zonal wind), and supplies the
+streamfunction for the wave-activity flux (quantmet.waf).
+
+Accuracy: vorticity and divergence are second-order finite differences on
+the GLQ grid, so the inversion error falls roughly as lmax^-1.7 (solid-body
+rotation: 2.5 % at lmax = 31, 0.8 % at 63, 0.24 % at 127).
+
+The output grid is pyshtools' extended Driscoll-Healy grid: it includes
+both poles and repeats longitude 0 at 360.
 
 Requires: pyshtools, xarray.
 """
