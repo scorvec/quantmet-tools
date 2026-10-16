@@ -1,0 +1,79 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "quantmet"
+dynamic = ["version"]                 # single source: quantmet/__init__.py __version__
+description = "Quantitative meteorology toolkit: TEM and Eliassen-Palm diagnostics, downward control, Takaya-Nakamura wave-activity flux, Gill model, QBO zero-wind line, Wheeler-Kiladis filtering, Helmholtz decomposition, DCT spectra, potential vorticity and the dynamic tropopause, Rossby wave packets, tropical-cyclone diagnostics, ensemble sensitivity, global conservation budgets, TC detection, significance tools, forecast verification (fair CRPS, Diebold-Mariano), moist thermodynamics and apparent temperature, and degree days"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [{ name = "Shawn Corvec" }]
+keywords = ["meteorology", "atmospheric dynamics", "stratosphere", "Eliassen-Palm flux",
+            "transformed Eulerian mean", "wave activity flux", "equatorial waves",
+            "potential vorticity", "tropical cyclones", "angular momentum", "forecast verification", "CRPS",
+            "thermodynamics", "wet-bulb temperature", "heat index", "degree days"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Topic :: Scientific/Engineering :: Atmospheric Science",
+]
+dependencies = ["numpy", "scipy"]
+
+[project.optional-dependencies]
+helmholtz = ["pyshtools", "xarray"]
+waf = ["pyshtools", "xarray"]
+tc = ["eccodes", "pyshtools", "xarray"]
+test = ["pytest"]
+all = ["pyshtools", "xarray", "eccodes", "pytest"]
+
+[project.urls]
+Homepage = "https://scorvec.com"
+Source = "https://github.com/scorvec/quantmet-tools"
+Changelog = "https://github.com/scorvec/quantmet-tools/blob/main/CHANGELOG.md"
+
+[tool.setuptools]
+packages = ["quantmet"]
+
+[tool.setuptools.dynamic]
+version = { attr = "quantmet.__version__" }
+
+[tool.setuptools.package-data]
+quantmet = ["tc_detect.c"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E", "W",   # pycodestyle
+    "F",        # pyflakes
+    "B",        # bugbear: likely bugs and design problems
+    "UP",       # pyupgrade: modern syntax for the supported Pythons
+    "C4",       # comprehensions
+    "SIM",      # simplifications
+    "PIE",      # misc. lints
+    "RUF",      # ruff's own rules
+    "PLE", "PLW",  # pylint errors and warnings
+    "PERF",     # performance anti-patterns
+]
+ignore = [
+    "E501",     # the formatter wraps code at 120; long URLs and literal strings are left intact
+    "E741",     # l, I and O follow the notation of the published equations they implement
+    "B905",     # zip() over arrays that have equal lengths by construction
+    "C408",     # dict(key=value) is used deliberately for keyword-style tables
+    "RUF001", "RUF002", "RUF003",  # degree signs, minus signs and Greek letters are intended
+    "RUF022",   # __all__ lists are grouped by topic, as in the README
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["B018"]   # bare expressions that assert a value can be computed
+"tests/test_helmholtz.py" = ["E402"]   # imports follow pytest.importorskip of the optional dependencies
+
+[tool.ruff.format]
+docstring-code-format = false
