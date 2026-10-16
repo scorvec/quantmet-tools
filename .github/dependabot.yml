@@ -1,0 +1,17 @@
+version: 2
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    groups:
+      actions: { patterns: ["*"] }
+  - package-ecosystem: pip
+    directory: /
+    schedule: { interval: weekly, day: monday }
+    groups:
+      python: { patterns: ["*"] }
+    ignore:
+      # MkDocs 2.0 drops the plugin and theme systems the documentation build relies on (Material for MkDocs,
+      # mkdocstrings); the docs extra stays on MkDocs 1.x until those support it.
+      - dependency-name: mkdocs
+        versions: [">=2"]

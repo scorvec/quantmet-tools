@@ -1,5 +1,21 @@
 # Changelog
 
+## Unreleased
+
+Project infrastructure only; the package code is unchanged.
+
+- **Documentation site** at [scorvec.com/quantmet-tools](https://scorvec.com/quantmet-tools/) (MkDocs, built strictly
+  and deployed from `main` by `docs.yml`): the overview, quick starts, numerical notes and install sections of the
+  README, and one API page per module with every docstring shown exactly as written. `pip install -e ".[docs]"`
+  installs the tools.
+- **PyPI**: `release.yml` builds the sdist and wheel on every change, checks them (`twine check --strict`, an import
+  of the installed wheel in a clean environment) and publishes a GitHub release to PyPI by Trusted Publishing; the
+  release tag must match `quantmet.__version__`.
+- **Packaging metadata**: SPDX license expression (`license = "MIT"`, setuptools >= 77), supported-Python and audience
+  classifiers, documentation and issue-tracker URLs; the sdist also carries the changelog and `CITATION.cff`.
+- **`CITATION.cff`**, a security policy (`SECURITY.md`), a `pre-commit` configuration running the CI ruff checks, and
+  Dependabot for the workflow actions and the Python dependencies.
+
 ## 0.4.2 — 2026-10-15
 
 ### Leap years

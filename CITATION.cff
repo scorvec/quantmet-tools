@@ -1,0 +1,31 @@
+cff-version: 1.2.0
+message: "If you use quantmet in published work, please cite it as below."
+title: "quantmet: quantitative meteorology tools"
+type: software
+authors:
+  - family-names: Corvec
+    given-names: Shawn
+repository-code: "https://github.com/scorvec/quantmet-tools"
+url: "https://scorvec.com/quantmet-tools/"
+license: MIT
+version: "0.4.2"
+date-released: "2026-10-15"
+abstract: >-
+  A Python toolkit for diagnosing atmospheric model output: transformed-Eulerian-mean and Eliassen-Palm
+  diagnostics, downward control, the Takaya-Nakamura wave-activity flux, the Gill model, the QBO zero-wind line,
+  Wheeler-Kiladis equatorial-wave filtering, Helmholtz decomposition, kinetic-energy spectra, potential vorticity and
+  the dynamic tropopause, Rossby wave packets, tropical-cyclone diagnostics and detection, ensemble sensitivity,
+  global conservation budgets, significance tests, forecast verification, moist thermodynamics and degree days.
+keywords:
+  - meteorology
+  - atmospheric dynamics
+  - stratosphere
+  - Eliassen-Palm flux
+  - transformed Eulerian mean
+  - wave activity flux
+  - equatorial waves
+  - potential vorticity
+  - tropical cyclones
+  - forecast verification
+  - thermodynamics
+  - degree days

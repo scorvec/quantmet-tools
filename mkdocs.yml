@@ -1,0 +1,94 @@
+site_name: quantmet
+site_description: Quantitative meteorology tools for Python
+site_url: https://scorvec.com/quantmet-tools/
+repo_url: https://github.com/scorvec/quantmet-tools
+repo_name: scorvec/quantmet-tools
+edit_uri: edit/main/docs/
+copyright: Copyright &copy; 2026 Shawn Corvec &middot; MIT License
+strict: true
+exclude_docs: |
+  *.py
+  __pycache__/
+
+theme:
+  name: material
+  features:
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - search.highlight
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Dark theme
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Light theme
+
+markdown_extensions:
+  - admonition
+  - tables
+  - toc:
+      permalink: true
+  - pymdownx.highlight
+  - pymdownx.superfences
+  - pymdownx.snippets:
+      base_path: ["."]
+      check_paths: true
+
+plugins:
+  - search
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [.]
+          options:
+            docstring_style: null
+            extensions:
+              - docs/plain_docstrings.py:PlainDocstrings
+            show_root_heading: false
+            show_root_toc_entry: false
+            show_source: false
+            members_order: source
+            filters: ["!^_"]
+            separate_signature: true
+            show_signature_annotations: true
+            heading_level: 2
+
+nav:
+  - Home: index.md
+  - Installation: install.md
+  - Quick starts: quickstarts.md
+  - Numerical notes: notes.md
+  - Case studies: case-studies.md
+  - API reference:
+      - Dynamics:
+          - quantmet.tem: api/tem.md
+          - quantmet.epflux: api/epflux.md
+          - quantmet.waf: api/waf.md
+          - quantmet.pv: api/pv.md
+          - quantmet.packets: api/packets.md
+          - quantmet.helmholtz: api/helmholtz.md
+          - quantmet.gill: api/gill.md
+          - quantmet.qbo: api/qbo.md
+      - Tropical waves and cyclones:
+          - quantmet.wk_filter: api/wk_filter.md
+          - quantmet.tc: api/tc.md
+          - quantmet.tc_detect: api/tc_detect.md
+      - Ensembles, statistics and verification:
+          - quantmet.ensemble: api/ensemble.md
+          - quantmet.stats: api/stats.md
+          - quantmet.verify: api/verify.md
+      - Thermodynamics and degree days:
+          - quantmet.thermo: api/thermo.md
+          - quantmet.constants: api/constants.md
+          - quantmet.degdays: api/degdays.md
+      - Budgets and spectra:
+          - quantmet.conservation: api/conservation.md
+          - quantmet.dct_spectra: api/dct_spectra.md
+  - Citing: citing.md
+  - Changelog: changelog.md

@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools>=61"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -8,15 +8,22 @@ dynamic = ["version"]                 # single source: quantmet/__init__.py __ve
 description = "Quantitative meteorology toolkit: TEM and Eliassen-Palm diagnostics, downward control, Takaya-Nakamura wave-activity flux, Gill model, QBO zero-wind line, Wheeler-Kiladis filtering, Helmholtz decomposition, DCT spectra, potential vorticity and the dynamic tropopause, Rossby wave packets, tropical-cyclone diagnostics, ensemble sensitivity, global conservation budgets, TC detection, significance tools, forecast verification (fair CRPS, Diebold-Mariano), moist thermodynamics and apparent temperature, and degree days"
 readme = "README.md"
 requires-python = ">=3.10"
-license = { text = "MIT" }
+license = "MIT"
+license-files = ["LICENSE"]
 authors = [{ name = "Shawn Corvec" }]
 keywords = ["meteorology", "atmospheric dynamics", "stratosphere", "Eliassen-Palm flux",
             "transformed Eulerian mean", "wave activity flux", "equatorial waves",
             "potential vorticity", "tropical cyclones", "angular momentum", "forecast verification", "CRPS",
             "thermodynamics", "wet-bulb temperature", "heat index", "degree days"]
 classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Operating System :: OS Independent",
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
     "Topic :: Scientific/Engineering :: Atmospheric Science",
 ]
 dependencies = ["numpy", "scipy"]
@@ -26,12 +33,15 @@ helmholtz = ["pyshtools", "xarray"]
 waf = ["pyshtools", "xarray"]
 tc = ["eccodes", "pyshtools", "xarray"]
 test = ["pytest"]
+docs = ["mkdocs>=1.6,<2", "mkdocs-material>=9,<10", "mkdocstrings[python]>=1,<2"]
 all = ["pyshtools", "xarray", "eccodes", "pytest"]
 
 [project.urls]
 Homepage = "https://scorvec.com"
 Source = "https://github.com/scorvec/quantmet-tools"
+Documentation = "https://scorvec.com/quantmet-tools/"
 Changelog = "https://github.com/scorvec/quantmet-tools/blob/main/CHANGELOG.md"
+Issues = "https://github.com/scorvec/quantmet-tools/issues"
 
 [tool.setuptools]
 packages = ["quantmet"]

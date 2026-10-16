@@ -1,5 +1,14 @@
 # quantmet
 
+[![tests](https://github.com/scorvec/quantmet-tools/actions/workflows/tests.yml/badge.svg)](https://github.com/scorvec/quantmet-tools/actions/workflows/tests.yml)
+[![build](https://github.com/scorvec/quantmet-tools/actions/workflows/release.yml/badge.svg)](https://github.com/scorvec/quantmet-tools/actions/workflows/release.yml)
+[![docs](https://github.com/scorvec/quantmet-tools/actions/workflows/docs.yml/badge.svg)](https://scorvec.com/quantmet-tools/)
+[![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://github.com/scorvec/quantmet-tools/blob/main/pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/scorvec/quantmet-tools/blob/main/LICENSE)
+
+Documentation: [scorvec.com/quantmet-tools](https://scorvec.com/quantmet-tools/)
+
+<!-- --8<-- [start:overview] -->
 Quantitative meteorology tools, extracted from the diagnostics pipelines
 behind [scorvec.com](https://scorvec.com), whose daily products import this
 package. `dct_spectra` and `tc_detect` come from products since retired and
@@ -29,9 +38,11 @@ has a test file in `tests/`, against analytic cases wherever one exists.
 | `quantmet.thermo` | Moist thermodynamics on SI inputs: saturation vapour pressure (Magnus/Alduchov–Eskridge, Bolton, Murphy–Koop; water and ice), pressure-aware humidity conversions, θ (dry and moist κ), T_v, θ_v, density temperature, θ_e (Bolton pseudo-adiabatic and reversible), θ_es, θ_l, θ_il, θ_w, Stull and psychrometric wet bulb, exact LCL, static energies, enthalpy, the pseudo-adiabat, column water / MSE / enthalpy 0 → p_s, hypsometric thickness; NWS heat index and wind chill; unit helpers | Bolton (1980, MWR); Alduchov & Eskridge (1996, JAM); Murphy & Koop (2005, QJRMS); Emanuel (1994); Davies-Jones (2008, MWR); Romps (2017, JAS); Stull (2011, JAMC); Rothfusz (1990); Osczevski & Bluestein (2005, BAMS) |
 | `quantmet.degdays` | Degree days: midpoint and integral conventions, degree hours by time-of-day block, degree days from daily extremes and a diurnal shape, expected degree days of a Gaussian temperature, kink-first weighted aggregation, DST-safe local days from UTC data, a 366-slot day of year, two-hinge balance-point fit | Thom (1954, MWR); Kissock, Haberl & Claridge (2003, ASHRAE RP-1050) |
 | `quantmet.constants` | One SI constant set (R_d, R_v, c_pd, c_pv, c_l, c_i, L_v0, L_f0, g, …) used by `thermo` | — |
+<!-- --8<-- [end:overview] -->
 
 ## Quick starts
 
+<!-- --8<-- [start:quickstarts] -->
 **Stratospheric momentum budget and the Brewer–Dobson circulation** (zonal
 means and eddy covariances from (plev, lat, lon) snapshots, levels 0.1–200 hPa):
 
@@ -243,16 +254,20 @@ hdd, cdd = D.weighted_dd(t_by_location, population)  # kink per location, THEN w
 hdd, cdd = D.expected_dd(ens_mean, ens_sd)  # E[max(65 - T, 0)] for T ~ N(mu, sigma^2)
 fit = D.fit_balance_points(daily_temp, daily_load, X=dow_dummies)  # fit.heat_base, fit.cool_base, slopes
 ```
+<!-- --8<-- [end:quickstarts] -->
 
 ## Case studies
 
-- [**AIFS single vs AIFS-ENS control: spectral fidelity by lead time**](examples/aifs_spectral_fidelity/)
+<!-- --8<-- [start:casestudies] -->
+- [**AIFS single vs AIFS-ENS control: spectral fidelity by lead time**](https://github.com/scorvec/quantmet-tools/tree/main/examples/aifs_spectral_fidelity)
   — the deterministic AIFS blurs progressively (MSE objective) while the
   CRPS-trained ENS control holds a realistic spectrum ten days in; measured
   with `quantmet.dct_spectra` on open data.
+<!-- --8<-- [end:casestudies] -->
 
 ## Numerical notes worth stealing
 
+<!-- --8<-- [start:notes] -->
 - **Quadratics are formed per member, then averaged.** E–P flux, [v′T′],
   the Takaya–Nakamura flux and every other eddy quadratic: the quadratic of
   the ensemble-MEAN fields fades with lead time as the members' phases
@@ -351,14 +366,21 @@ fit = D.fit_balance_points(daily_temp, daily_load, X=dow_dummies)  # fit.heat_ba
   integral HDD of 1.83; they agree only when the whole day sits on one side
   of the base, so shoulder seasons are where they part. Expected degree days
   of N(μ, σ²) exceed the degree days of μ by up to 0.4 σ.
+<!-- --8<-- [end:notes] -->
 
 ## Install
 
+<!-- --8<-- [start:install] -->
 ```bash
-pip install .                        # core: numpy, scipy
-pip install ".[helmholtz]"           # + pyshtools, xarray (helmholtz; the waf streamfunction path)
-pip install ".[tc]"                  # + eccodes for ECMWF track BUFR, pyshtools/xarray for the outflow wind
-pip install ".[test]" && pytest      # the test suite
+pip install quantmet                 # core: numpy, scipy
+pip install "quantmet[helmholtz]"    # + pyshtools, xarray (helmholtz; the waf streamfunction path)
+pip install "quantmet[tc]"           # + eccodes for ECMWF track BUFR, pyshtools/xarray for the outflow wind
+```
+
+Until the first release is on PyPI, install a tagged release from GitHub (extras as above):
+
+```bash
+pip install "quantmet @ git+https://github.com/scorvec/quantmet-tools@v0.4.2"
 ```
 
 `quantmet.degdays.local_days` uses the standard-library `zoneinfo`, which
@@ -368,3 +390,21 @@ has none).
 The TC kernel compiles itself with `cc` on first use into a per-user cache
 directory (`$QUANTMET_CACHE_DIR`, else `$XDG_CACHE_HOME/quantmet`, else
 `~/.cache/quantmet`).
+<!-- --8<-- [end:install] -->
+
+## Development
+
+<!-- --8<-- [start:development] -->
+```bash
+pip install -e ".[test]"   # editable install with pytest
+pre-commit install         # ruff lint and format on every commit, as in CI
+pytest
+```
+
+Documentation builds with `pip install -e ".[docs]"` and `mkdocs serve`.
+<!-- --8<-- [end:development] -->
+
+## Citing
+
+If you use quantmet in published work, please cite it: [`CITATION.cff`](https://github.com/scorvec/quantmet-tools/blob/main/CITATION.cff)
+holds the metadata, and GitHub's "Cite this repository" button formats it.

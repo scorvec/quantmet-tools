@@ -1,0 +1,3 @@
+# quantmet.degdays
+
+::: quantmet.degdays
