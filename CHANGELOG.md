@@ -1,6 +1,31 @@
 # Changelog
 
-## Unreleased
+## 0.4.3 — 2026-10-17
+
+### Fixed
+
+- **`quantmet.tc_detect`**: a non-finite sea-level pressure is never a candidate, and a NaN anywhere in a candidate's
+  annulus voids it. Before, both comparisons let NaN through, so one masked cell made every point within the ring
+  radius a "candidate" (a 5 x 5 NaN block on a flat 1-degree field returned the 4,096-candidate cap). The kernel is
+  rebuilt automatically (its cache name hashes the C source).
+- **`quantmet.tem`** (`tem_terms`, `residual_streamfunction`): the static-stability floor now treats a neutral or
+  unstable layer as marginally stable (th_p <= -1e-7 K/Pa), as `quantmet.epflux` does; before, a positive th_p
+  passed through and flipped the sign of psi_e there. No change where theta decreases with pressure.
+
+### Changed
+
+- **One set of physical constants** (`quantmet.constants`) in every module. Omega was 7.292e-5 (epflux, tem,
+  wk_filter), 7.2921e-5 (pv) and 7.292115e-5 (constants, conservation); kappa 0.2854 (epflux) and 0.2857 (tem, pv);
+  g 9.81 (wk_filter); Gill's beta 2.28e-11 against 2 Omega / a = 2.289e-11. Effects are at the 0.1 % level or
+  below (the E-P flux uses kappa through theta' / theta_p, whose ratio barely depends on it); Gill's deformation
+  radius shrinks 0.2 %.
+- **`quantmet.tc_detect`** raises a `RuntimeError` naming the missing compiler (and the `CC` variable) when the
+  kernel cannot be built, instead of a bare `FileNotFoundError`.
+- **`quantmet.tc.recurvature`** docstring states what the code returns: the last point without eastward motion
+  before the motion first reaches `east`, for a track that moved westward earlier.
+- **CI** tests Python 3.13 as well.
+
+## Unreleased infrastructure (now part of 0.4.3)
 
 Project infrastructure only; the package code is unchanged.
 

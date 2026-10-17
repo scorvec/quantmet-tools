@@ -22,8 +22,8 @@ L_v(T) = LV0 + (CPV - CL)(T - T0) (dL_v/dT = -2372 J kg-1 K-1, Bolton's 1980
 value is -2370) and L_f(T) = LF0 + (CL - CI)(T - T0); see
 ``quantmet.thermo.latent_heat``.
 
-``quantmet.thermo`` uses these. Modules older than 0.4 still carry their own module-level constants (some
-deliberately different, e.g. the E-P flux's kappa = 0.2854), so that their published numbers do not move.
+Every module reads its physical constants from here (since 0.4.3; before that each carried its own, with Omega
+between 7.292e-5 and 7.292115e-5, kappa 0.2854 in the E-P flux and 0.2857 elsewhere, and g 9.81 in the wave filter).
 
 Formula-specific constants that are part of a published fit (Bolton's 0.2854,
 the Magnus coefficients, Romps's 2017 constant set for the exact LCL) stay

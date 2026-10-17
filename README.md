@@ -372,7 +372,7 @@ fit = D.fit_balance_points(daily_temp, daily_load, X=dow_dummies)  # fit.heat_ba
 
 <!-- --8<-- [start:install] -->
 ```bash
-pip install quantmet                 # core: numpy, scipy
+pip install quantmet                 # core: numpy, scipy (PyPI release pending; use the tag below until then)
 pip install "quantmet[helmholtz]"    # + pyshtools, xarray (helmholtz; the waf streamfunction path)
 pip install "quantmet[tc]"           # + eccodes for ECMWF track BUFR, pyshtools/xarray for the outflow wind
 ```
@@ -380,7 +380,7 @@ pip install "quantmet[tc]"           # + eccodes for ECMWF track BUFR, pyshtools
 Until the first release is on PyPI, install a tagged release from GitHub (extras as above):
 
 ```bash
-pip install "quantmet @ git+https://github.com/scorvec/quantmet-tools@v0.4.2"
+pip install "quantmet @ git+https://github.com/scorvec/quantmet-tools@v0.4.3"
 ```
 
 `quantmet.degdays.local_days` uses the standard-library `zoneinfo`, which

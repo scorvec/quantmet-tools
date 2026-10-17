@@ -54,7 +54,7 @@ int detect_step(const float *msl, const float *wind,
         const float *rowp = msl + (size_t)i * nlon;
         for (int j = 0; j < nlon; j++) {
             const float c = rowp[j];
-            if (c >= p_track) continue;
+            if (!(c < p_track)) continue;     /* also rejects NaN (every comparison with it is false) */
 
             /* local minimum over the (2*min_py+1) x (2*min_px+1) neighbourhood: no neighbour LOWER (a tie
              * with a neighbour still counts, so a flat-bottomed low can give adjacent candidates) */
@@ -91,7 +91,7 @@ int detect_step(const float *msl, const float *wind,
             double n_in = (double)(in1 - in0) * (ji1 - ji0);
             double ring = (outer - inner) / (n_out - n_in);
             float depth = (float)(ring - c);
-            if (depth < depth_min) continue;
+            if (!(depth >= depth_min)) continue;     /* a NaN in the annulus voids the candidate */
 
             /* peak wind near the centre (few candidates -> direct scan) */
             float wmax = 0.0f;

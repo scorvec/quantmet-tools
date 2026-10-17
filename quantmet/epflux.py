@@ -57,11 +57,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
-A_EARTH = 6.371e6
-OMEGA = 7.292e-5
-KAPPA = 0.2854
+from .constants import A_EARTH, G, KAPPA, OMEGA
+
 P_REF = 1000.0  # hPa, for potential temperature
-G = 9.80665
 H_SCALE = 7000.0  # m, log-pressure scale height
 __all__ = ["EPFlux", "zonal_bandpass", "ep_flux", "ensemble_ep_flux", "charney_drazin_uc", "charney_drazin_excess"]
 

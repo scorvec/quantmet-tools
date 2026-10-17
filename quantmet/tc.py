@@ -36,7 +36,8 @@ from __future__ import annotations
 
 import numpy as np
 
-A_EARTH = 6.371e6
+from .constants import A_EARTH
+
 MISSING = -1e99
 __all__ = [
     "decode_tracks",
@@ -142,8 +143,9 @@ def within(lat, lon, clat, clon, r_km) -> np.ndarray:
 
 
 def recurvature(track: dict, west: float = -1.0, east: float = 2.0):
-    """Lead (h) of the last westward-moving point (24-h zonal motion <= west m/s) before the motion reaches >= east
-    m/s; None if the track never turns. Needs steps every 12 h or finer."""
+    """Lead (h) of the turn: the last point with no eastward motion (24-h zonal motion <= 0) before the motion first
+    reaches >= east m/s, for a track that moved westward (<= west m/s) earlier; None if it never did or never turns
+    east. Needs steps every 12 h or finer."""
     st = np.asarray(track["steps"], float)
     la = np.asarray(track["lat"], float)
     lo = np.rad2deg(np.unwrap(np.deg2rad(np.asarray(track["lon"], float))))

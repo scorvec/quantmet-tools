@@ -43,9 +43,9 @@ from functools import lru_cache
 
 import numpy as np
 
-G = 9.81
-A_EARTH = 6.371e6
-BETA = 2.0 * 7.292e-5 / A_EARTH
+from .constants import A_EARTH, G, OMEGA
+
+BETA = 2.0 * OMEGA / A_EARTH
 DAY = 86400.0
 
 WAVES = {

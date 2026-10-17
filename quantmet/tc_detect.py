@@ -6,7 +6,10 @@ with a neighbour still counts, so a flat-bottomed low can return adjacent
 candidates) that are at least `depth` hPa deeper than the mean pressure on a
 surrounding annulus, square in degrees and centred on the candidate,
 using a summed-area table so the ring test is O(1) per gridpoint regardless
-of ring radius. Longitude-wrapped ghost columns handle the date line. ~10x
+of ring radius. Longitude-wrapped ghost columns handle the date line. A
+non-finite pressure is never a candidate, and a NaN anywhere in a candidate's
+annulus voids it (before 0.4.3 both passed, and one masked cell flooded the
+candidate list). ~10x
 the throughput of the chained scipy filters it replaces; it tracked the
 101-member ECMWF ensemble to day 15 in seconds for the site's former TC
 tracker.
@@ -66,9 +69,14 @@ def _lib():
         so.parent.mkdir(parents=True, exist_ok=True)
         fd, tmp = tempfile.mkstemp(suffix=_suffix(), dir=so.parent)
         os.close(fd)
+        cc = os.environ.get("CC", "cc")
         try:
-            subprocess.run([os.environ.get("CC", "cc"), "-O3", "-shared", "-fPIC", str(_SRC), "-o", tmp], check=True)
+            subprocess.run([cc, "-O3", "-shared", "-fPIC", str(_SRC), "-o", tmp], check=True)
             os.replace(tmp, so)
+        except FileNotFoundError:
+            raise RuntimeError(
+                f"quantmet.tc_detect needs a C compiler to build its kernel ({cc!r} not found): install one or set CC"
+            ) from None
         finally:
             if os.path.exists(tmp):
                 os.unlink(tmp)

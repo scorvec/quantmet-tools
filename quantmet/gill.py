@@ -72,13 +72,13 @@ from __future__ import annotations
 
 import numpy as np
 
-A_EARTH = 6.371e6
+from .constants import A_EARTH, G, OMEGA
+
 C_WAVE = 30.0  # m/s: first baroclinic mode, moist-reduced
-BETA = 2.28e-11  # 1/(m s): 2 Omega / a
+BETA = 2.0 * OMEGA / A_EARTH  # 1/(m s), 2.289e-11
 EPS = 0.1  # nondimensional damping (Gill 1980)
 L_V = 2.5e6  # J/kg, latent heat of condensation
 C_P = 1004.0  # J/(kg K)
-G = 9.80665
 W_PER_MM_DAY = L_V / 86400.0  # 1 mm/day of rain = 28.9 W/m^2 of column heating
 
 __all__ = [

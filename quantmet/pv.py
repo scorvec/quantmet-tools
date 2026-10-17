@@ -31,11 +31,9 @@ from __future__ import annotations
 
 import numpy as np
 
-A_EARTH = 6.371e6
-OMEGA = 7.2921e-5
-G0 = 9.80665
-KAPPA = 0.2857
-P0 = 1.0e5
+from .constants import A_EARTH, KAPPA, OMEGA, P0
+from .constants import G as G0
+
 __all__ = ["potential_temperature", "ertel_pv", "dynamic_tropopause", "on_isentrope"]
 
 

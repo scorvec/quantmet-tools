@@ -41,7 +41,8 @@ import numpy as np
 import xarray as xr
 import pyshtools as pysh
 
-A_EARTH = 6.371e6
+from .constants import A_EARTH
+
 __all__ = ["velocity_potential", "streamfunction", "irrotational_wind", "nondivergent_wind"]
 
 

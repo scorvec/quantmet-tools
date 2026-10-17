@@ -1,5 +1,6 @@
 import numpy as np
 
+from quantmet.constants import G, OMEGA
 from quantmet.pv import ertel_pv, dynamic_tropopause, on_isentrope, potential_temperature
 
 LEV = np.array([1000, 850, 700, 500, 400, 300, 250, 200, 150, 100], float) * 100.0
@@ -19,9 +20,9 @@ def test_resting_atmosphere_pv_is_f_times_stability():
     tz = np.maximum(288.0 - 6.5e-3 * 7000 * np.log(1e5 / LEV), 216.65)  # troposphere + isothermal stratosphere
     t, u, v = _resting(tz)
     pv, _th = ertel_pv(t, u, v, LEV, LAT, LON, smooth=False)
-    f = 2 * 7.2921e-5 * np.sin(np.deg2rad(LAT))
+    f = 2 * OMEGA * np.sin(np.deg2rad(LAT))
     th_p = np.gradient(potential_temperature(tz, LEV), LEV)
-    expect = -9.80665 * f[None, :] * th_p[:, None] * 1e6
+    expect = -G * f[None, :] * th_p[:, None] * 1e6
     assert np.allclose(pv[:, :, 0], expect, rtol=1e-6, atol=1e-9)
     assert (pv[:, LAT > 5] > 0).all() and (pv[:, LAT < -5] < 0).all()  # stable: PV has the sign of f
 

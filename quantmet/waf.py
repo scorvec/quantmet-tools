@@ -85,9 +85,9 @@ from dataclasses import dataclass
 
 import numpy as np
 
+from .constants import A_EARTH
 from .degdays import doy366
 
-A_EARTH = 6.371e6
 UMIN = 3.0  # m/s: basic-state wind below which the flux is masked
 LAT_MIN = 20.0  # deg: tropical mask
 TSMOOTH = 5  # samples (days): running mean of psi' along the lead

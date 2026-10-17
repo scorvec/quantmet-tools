@@ -57,9 +57,9 @@ Numerical notes that matter in practice:
   and a fixed band keeps the index linear, so a mean of daily values is the
   index of the mean circulation.
 - STATIC STABILITY. th_p is the LOCAL zonal-mean d theta/dp, floored at
-  -1e-7 K/Pa. That is safe in the stratosphere; tropospheric work near a
-  neutral boundary layer wants the QG global-mean profile instead
-  (quantmet.epflux).
+  -1e-7 K/Pa (a neutral or unstable layer is treated as marginally stable).
+  That is fine in the stratosphere; tropospheric work near a neutral boundary
+  layer wants the QG global-mean profile instead (quantmet.epflux).
 
 Powers the zonal-momentum budget, the Brewer-Dobson downward-control
 section and the 100 hPa eddy heat flux on
@@ -74,10 +74,8 @@ from dataclasses import dataclass
 
 import numpy as np
 
-A_EARTH = 6.371e6
-G = 9.80665
-OMEGA = 7.292e-5
-KAPPA = 0.2857  # R/c_p, dry air
+from .constants import A_EARTH, G, KAPPA, OMEGA
+
 P_REF = 1000.0  # hPa, for potential temperature
 H_SCALE = 7000.0  # m, log-pressure scale height
 DEFAULT_GROUPS = {"k1": (1, 1), "k2": (2, 2), "k3p": (3, None)}
@@ -228,7 +226,9 @@ def tem_terms(lat, plev, r: dict, groups=None) -> dict:
     pk = (P_REF / _p_axis(plev))[:, None] ** KAPPA
     th = r["tbar"] * pk
     th_p = np.gradient(th, p, axis=-2)
-    th_p = np.where(np.abs(th_p) < 1e-7, -1e-7, th_p)
+    th_p = np.where(
+        th_p > -1e-7, -1e-7, th_p
+    )  # never neutral or unstable (a positive th_p flipped psi_e's sign before 0.4.3)
     u = r["ubar"]
     u_p = np.gradient(u, p, axis=-2)
     f = 2 * OMEGA * np.sin(phi)
@@ -278,7 +278,7 @@ def residual_streamfunction(lat, plev, vbar, tbar, vT) -> np.ndarray:
     p = ph * 100.0
     pk = (P_REF / ph)[:, None] ** KAPPA
     th_p = np.gradient(np.asarray(tbar, float) * pk, p, axis=-2)
-    th_p = np.where(np.abs(th_p) < 1e-7, -1e-7, th_p)
+    th_p = np.where(th_p > -1e-7, -1e-7, th_p)
     iv = _cumtrapz_from_top(np.asarray(vbar, float), p)
     return 2 * np.pi * A_EARTH * c / G * (iv - np.asarray(vT, float) * pk / th_p)
 

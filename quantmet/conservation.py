@@ -41,13 +41,11 @@ from __future__ import annotations
 
 import numpy as np
 
-A_EARTH = 6.371e6
-G = 9.80665
-OMEGA = 7.292115e-5
-CP = 1004.7
-RD = 287.04
+from .constants import A_EARTH, G, OMEGA, RD
+from .constants import CPD as CP
+from .constants import LV0 as LV
+
 CV = CP - RD
-LV = 2.501e6
 __all__ = [
     "layer_thickness",
     "area_weights",
