@@ -8,8 +8,8 @@ authors:
 repository-code: "https://github.com/scorvec/quantmet-tools"
 url: "https://scorvec.com/quantmet-tools/"
 license: MIT
-version: "0.4.3"
-date-released: "2026-10-17"
+version: "0.4.4"
+date-released: "2026-10-28"
 abstract: >-
   A Python toolkit for diagnosing atmospheric model output: transformed-Eulerian-mean and Eliassen-Palm
   diagnostics, downward control, the Takaya-Nakamura wave-activity flux, the Gill model, the QBO zero-wind line,

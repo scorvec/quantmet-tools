@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.4 — 2026-10-28
+
+### Changed
+
+- **Distribution name**: the package is published on PyPI as `quantmet-tools`, the repository's name
+  (`quantmet` is too close to an existing project's name for PyPI). The import name is still `quantmet`:
+  `pip install quantmet-tools`, then `import quantmet`. The package code is unchanged.
+
 ## 0.4.3 — 2026-10-17
 
 ### Fixed

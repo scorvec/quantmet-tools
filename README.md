@@ -2,6 +2,7 @@
 
 [![tests](https://github.com/scorvec/quantmet-tools/actions/workflows/tests.yml/badge.svg)](https://github.com/scorvec/quantmet-tools/actions/workflows/tests.yml)
 [![build](https://github.com/scorvec/quantmet-tools/actions/workflows/release.yml/badge.svg)](https://github.com/scorvec/quantmet-tools/actions/workflows/release.yml)
+[![PyPI](https://img.shields.io/pypi/v/quantmet-tools)](https://pypi.org/project/quantmet-tools/)
 [![docs](https://github.com/scorvec/quantmet-tools/actions/workflows/docs.yml/badge.svg)](https://scorvec.com/quantmet-tools/)
 [![Python](https://img.shields.io/badge/python-3.10%20%7C%203.11%20%7C%203.12-blue)](https://github.com/scorvec/quantmet-tools/blob/main/pyproject.toml)
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](https://github.com/scorvec/quantmet-tools/blob/main/LICENSE)
@@ -372,15 +373,16 @@ fit = D.fit_balance_points(daily_temp, daily_load, X=dow_dummies)  # fit.heat_ba
 
 <!-- --8<-- [start:install] -->
 ```bash
-pip install quantmet                 # core: numpy, scipy (PyPI release pending; use the tag below until then)
-pip install "quantmet[helmholtz]"    # + pyshtools, xarray (helmholtz; the waf streamfunction path)
-pip install "quantmet[tc]"           # + eccodes for ECMWF track BUFR, pyshtools/xarray for the outflow wind
+pip install quantmet-tools                 # core: numpy, scipy
+pip install "quantmet-tools[helmholtz]"    # + pyshtools, xarray (helmholtz; the waf streamfunction path)
+pip install "quantmet-tools[tc]"           # + eccodes for ECMWF track BUFR, pyshtools/xarray for the outflow wind
 ```
 
-Until the first release is on PyPI, install a tagged release from GitHub (extras as above):
+The package imports as `quantmet` (`from quantmet.tem import tem_terms`). Releases before 0.4.4 are not on
+PyPI and carry the old distribution name; install one from its GitHub tag:
 
 ```bash
-pip install "quantmet @ git+https://github.com/scorvec/quantmet-tools@v0.4.3"
+pip install "quantmet @ git+https://github.com/scorvec/quantmet-tools@v0.4.2"
 ```
 
 `quantmet.degdays.local_days` uses the standard-library `zoneinfo`, which

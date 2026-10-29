@@ -7,4 +7,4 @@ optional dependencies of one module (pyshtools, xarray for helmholtz and the
 streamfunction path of waf) never burden another.
 """
 
-__version__ = "0.4.3"  # the only place the version is set (pyproject.toml reads it)
+__version__ = "0.4.4"  # the only place the version is set (pyproject.toml reads it)

@@ -58,7 +58,7 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: pypi
-      url: https://pypi.org/project/quantmet/
+      url: https://pypi.org/project/quantmet-tools/
     permissions:
       id-token: write  # the OIDC token Trusted Publishing exchanges for a short-lived upload token
     steps:

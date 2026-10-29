@@ -76,7 +76,7 @@ https://scorvec.com/circulation.html (AIFS-ENS, 25 members, day 0-15).
 
 Requires: numpy (flux); scipy for mask_taper; pyshtools + xarray for
 streamfunction_anomaly and the truncated divergence (sh_truncate,
-sh_divergence) (pip install quantmet[waf]).
+sh_divergence) (pip install "quantmet-tools[waf]").
 """
 
 from __future__ import annotations
