@@ -2,6 +2,7 @@ import numpy as np
 
 from quantmet.constants import G, OMEGA
 from quantmet.pv import ertel_pv, dynamic_tropopause, on_isentrope, potential_temperature
+from quantmet.tem import theta_p
 
 LEV = np.array([1000, 850, 700, 500, 400, 300, 250, 200, 150, 100], float) * 100.0
 LAT = np.arange(-80, 80.1, 2.0)
@@ -21,7 +22,7 @@ def test_resting_atmosphere_pv_is_f_times_stability():
     t, u, v = _resting(tz)
     pv, _th = ertel_pv(t, u, v, LEV, LAT, LON, smooth=False)
     f = 2 * OMEGA * np.sin(np.deg2rad(LAT))
-    th_p = np.gradient(potential_temperature(tz, LEV), LEV)
+    th_p = theta_p(potential_temperature(tz, LEV), LEV, axis=0)  # the function's own stability: ln theta in ln p
     expect = -G * f[None, :] * th_p[:, None] * 1e6
     assert np.allclose(pv[:, :, 0], expect, rtol=1e-6, atol=1e-9)
     assert (pv[:, LAT > 5] > 0).all() and (pv[:, LAT < -5] < 0).all()  # stable: PV has the sign of f
