@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- **Static stability in `tem.tem_terms`, `tem.residual_streamfunction` and `pv.ertel_pv`**: d theta/dp is now taken
+  through ln theta in ln p (`tem.theta_p`). `np.gradient(theta, p)` is badly off on widely spaced levels: for an
+  isothermal 220 K profile on ECMWF's open-data levels it gave 0.32 of the true value at 10 hPa and 1.70 at 50 hPa,
+  which carries into the eddy streamfunction, the residual circulation and the potential vorticity.
+
 ## 0.4.4 — 2026-10-28
 
 ### Changed

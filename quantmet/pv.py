@@ -8,7 +8,8 @@ searching UPWARD from the lowest level and interpolating linearly in PV between 
 Isentropic PV interpolates linearly in theta.
 
 Implementation notes that matter in practice:
-- Pressure derivatives use np.gradient on the ACTUAL pressure levels (second order on a non-uniform grid);
+- Pressure derivatives use np.gradient on the ACTUAL pressure levels (second order on a non-uniform grid), the
+  stability d theta/dp through ln theta in ln p (quantmet.tem.theta_p);
   horizontal derivatives are centred, periodic in longitude.
 - PV does not survive ensemble averaging: a mean of fifty tropopause folds is a smear, so compute it per member
   (or on one member) and never on the ensemble-mean fields.
@@ -33,6 +34,7 @@ import numpy as np
 
 from .constants import A_EARTH, KAPPA, OMEGA, P0
 from .constants import G as G0
+from .tem import theta_p
 
 __all__ = ["potential_temperature", "ertel_pv", "dynamic_tropopause", "on_isentrope"]
 
@@ -68,7 +70,7 @@ def ertel_pv(
 
     zeta = ddx(v) - ddy(u * cosphi) / cosphi
     f = (2 * OMEGA * np.sin(phi))[None, :, None]
-    th_p = np.gradient(th, p_pa, axis=0)
+    th_p = theta_p(th, p_pa, axis=0)
     u_p = np.gradient(u, p_pa, axis=0)
     v_p = np.gradient(v, p_pa, axis=0)
     pv = -G0 * ((zeta + f) * th_p - v_p * ddx(th) + u_p * ddy(th)) * 1e6

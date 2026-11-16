@@ -61,7 +61,7 @@ Numerical notes that matter in practice:
   That is fine in the stratosphere; tropospheric work near a neutral boundary
   layer wants the QG global-mean profile instead (quantmet.epflux).
 
-Powers the zonal-momentum budget, the Brewer-Dobson downward-control
+The methods of the zonal-momentum budget, the Brewer-Dobson downward-control
 section and the 100 hPa eddy heat flux on
 https://scorvec.com/stratosphere.html.
 
@@ -85,6 +85,7 @@ __all__ = [
     "eddy_covariances",
     "eddy_heat_flux",
     "HeatFlux",
+    "theta_p",
     "tem_terms",
     "residual_streamfunction",
     "residual_velocities",
@@ -209,6 +210,18 @@ def _geometry(lat):
     return phi, c, cc
 
 
+def theta_p(th, p, axis: int = -2):
+    """d theta / dp through ln theta in ln p: (theta / p) d ln theta / d ln p along `axis`, p (Pa or hPa, the result per
+    that unit) one-dimensional. theta is close to a power of p, so its logarithm is close to linear in ln p and the
+    centred difference is nearly exact; np.gradient(theta, p) on widely spaced levels is not (isothermal 220 K on
+    ECMWF's open-data levels: 0.32 of the true value at 10 hPa, 1.70 at 50 hPa)."""
+    th = np.asarray(th, float)
+    shape = [1] * th.ndim
+    shape[axis] = -1
+    pb = np.asarray(p, float).reshape(shape)
+    return np.gradient(np.log(th), np.log(np.asarray(p, float)), axis=axis) * th / pb
+
+
 def tem_terms(lat, plev, r: dict, groups=None) -> dict:
     """TEM terms on (..., plev, lat) from the zonal means and covariances of
     eddy_covariances (which must include omega). plev in hPa, any monotonic
@@ -225,7 +238,7 @@ def tem_terms(lat, plev, r: dict, groups=None) -> dict:
     p = _p_axis(plev) * 100.0
     pk = (P_REF / _p_axis(plev))[:, None] ** KAPPA
     th = r["tbar"] * pk
-    th_p = np.gradient(th, p, axis=-2)
+    th_p = theta_p(th, p)
     th_p = np.where(
         th_p > -1e-7, -1e-7, th_p
     )  # never neutral or unstable (a positive th_p flipped psi_e's sign before 0.4.3)
@@ -277,7 +290,7 @@ def residual_streamfunction(lat, plev, vbar, tbar, vT) -> np.ndarray:
     ph = _p_axis(plev)
     p = ph * 100.0
     pk = (P_REF / ph)[:, None] ** KAPPA
-    th_p = np.gradient(np.asarray(tbar, float) * pk, p, axis=-2)
+    th_p = theta_p(np.asarray(tbar, float) * pk, p)
     th_p = np.where(th_p > -1e-7, -1e-7, th_p)
     iv = _cumtrapz_from_top(np.asarray(vbar, float), p)
     return 2 * np.pi * A_EARTH * c / G * (iv - np.asarray(vT, float) * pk / th_p)

@@ -191,3 +191,17 @@ def test_nan_input_rejected():
     u[0, 0, 0] = np.nan
     with pytest.raises(ValueError):
         tem.eddy_covariances(u, u, u)
+
+
+def test_theta_p_isothermal():
+    """An isothermal column has d theta/dp = -kappa theta / p exactly; widely spaced levels must not change that."""
+    import numpy as np
+
+    from quantmet.constants import KAPPA
+    from quantmet.tem import theta_p
+
+    p = np.array([1000.0, 850, 700, 500, 300, 250, 200, 100, 50, 10]) * 100.0
+    th = 220.0 * (1e5 / p) ** KAPPA
+    exact = -KAPPA * th / p
+    assert np.allclose(theta_p(th[:, None], p)[:, 0], exact, rtol=1e-10)
+    assert np.allclose(theta_p(th[:, None, None], p, axis=0)[:, 0, 0], exact, rtol=1e-10)
