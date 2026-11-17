@@ -39,10 +39,10 @@ from quantmet.stats import benjamini_hochberg
 from quantmet import verify, thermo
 
 hf = eddy_heat_flux(v100, t100, lat, kmax=72, lat_band=(45, 75))  # 100 hPa [v'T'], total and by wavenumber
-kelvin = wk_filter(olr_anom, "Kelvin")                            # (time, ..., lon) in, same shape out
-sig = benjamini_hochberg(pvals, alpha=0.10)                       # field significance mask
-crps = verify.crps_fair(ens, obs)                                 # members on the last axis
-tw = thermo.wet_bulb_temperature(t, p, rh=rh)                     # K, Pa, %
+kelvin = wk_filter(olr_anom, "Kelvin")  # (time, ..., lon) in, same shape out
+sig = benjamini_hochberg(pvals, alpha=0.10)  # field significance mask
+crps = verify.crps_fair(ens, obs)  # members on the last axis
+tw = thermo.wet_bulb_temperature(t, p, rh=rh)  # K, Pa, %
 ```
 
 More examples: [quick starts](https://scorvec.com/quantmet-tools/quickstarts/). Pitfalls each module avoids:
